@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your Generated Roadmap | PathGen AI</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = { darkMode: 'class' };
+    </script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body class="bg-gray-50 dark:bg-gray-900 min-h-screen flex flex-col transition-colors duration-300">
+    {% include 'includes/_navbar.html' %}
+    <div class="max-w-3xl mx-auto p-6 flex-1 flex flex-col">
+        <section class="flex flex-col items-center justify-center text-center py-8 mb-8 bg-gradient-to-br from-blue-50 to-white dark:from-gray-900 dark:to-gray-800 rounded-xl shadow">
+            <h1 class="text-4xl font-extrabold text-blue-700 dark:text-blue-300 mb-2 flex items-center justify-center gap-2">
+                Your Generated Roadmap <span>🛣️</span>
+            </h1>
+            <p class="text-lg text-gray-600 dark:text-gray-300 max-w-xl mx-auto mb-2">Follow this personalized plan to achieve your dream!</p>
+        </section>
+        <main class="flex-1">
+            <div class="bg-white dark:bg-gray-800 shadow-lg rounded-xl p-8 mb-8 prose dark:prose-invert max-w-none" id="roadmapContent"></div>
+            <div class="flex flex-col sm:flex-row gap-3 mt-4">
+                <button id="downloadPdfBtn" class="w-full sm:w-auto bg-green-600 dark:bg-green-700 text-white font-semibold py-1 px-3 text-sm rounded hover:bg-green-700 dark:hover:bg-green-800 transition" aria-label="Download as PDF">Download as PDF</button>
+                <button id="exportWordBtn" class="w-full sm:w-auto bg-indigo-600 dark:bg-indigo-700 text-white font-semibold py-1 px-3 text-sm rounded hover:bg-indigo-700 dark:hover:bg-indigo-800 transition" aria-label="Export as Word">Export as Word</button>
+                <button id="emailRoadmapBtn" class="w-full sm:w-auto bg-blue-500 dark:bg-blue-600 text-white font-semibold py-1 px-3 text-sm rounded hover:bg-blue-600 dark:hover:bg-blue-700 transition" aria-label="Email Roadmap">Email Roadmap</button>
+                <button id="copyBtn" class="w-full sm:w-auto bg-yellow-500 dark:bg-yellow-600 text-white font-semibold py-1 px-3 text-sm rounded hover:bg-yellow-600 dark:hover:bg-yellow-700 transition" aria-label="Copy to Clipboard">Copy to Clipboard</button>
+                <button id="printBtn" class="w-full sm:w-auto bg-gray-500 dark:bg-gray-700 text-white font-semibold py-1 px-3 text-sm rounded hover:bg-gray-600 dark:hover:bg-gray-800 transition" aria-label="Print">Print</button>
+                <button id="shareBtn" class="w-full sm:w-auto bg-purple-600 dark:bg-purple-700 text-white font-semibold py-1 px-3 text-sm rounded hover:bg-purple-700 dark:hover:bg-purple-800 transition" aria-label="Share">Share</button>
+                <a href="/" class="w-full sm:w-auto inline-block px-3 py-1 text-sm bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded hover:bg-gray-300 dark:hover:bg-gray-600 font-semibold transition text-center" aria-label="Back to Home">Back to Home</a>
+            </div>
+        </main>
+    </div>
+    <!-- Progress Bar -->
+    <div class="max-w-3xl mx-auto w-full px-6 mb-4">
+      <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-3">
+        <div id="progressBar" class="bg-blue-600 dark:bg-blue-400 h-3 rounded-full transition-all duration-300" style="width: 0%"></div>
+      </div>
+      <div class="text-right text-xs text-gray-500 dark:text-gray-300 mt-1" id="progressText"></div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/docx/8.0.3/docx.umd.min.js"></script>
+    <script>
+      // Render the roadmap Markdown as HTML
+      const roadmapMarkdown = {{ roadmap|tojson|safe }};
+      document.getElementById('roadmapContent').innerHTML = marked.parse(roadmapMarkdown);
+
+      // --- Enhance roadmap display ---
+      function enhanceRoadmap() {
+        const content = document.getElementById('roadmapContent');
+        if (!content) return;
+        // Add icons and badges to sections
+        content.querySelectorAll('h3, h2').forEach(h => {
+          if (/phase|section/i.test(h.textContent)) {
+            h.classList.add('inline-flex', 'items-center', 'gap-2', 'px-3', 'py-1', 'rounded-full', 'bg-blue-100', 'dark:bg-blue-900', 'text-blue-700', 'dark:text-blue-200', 'text-base', 'mb-2', 'mt-8', 'border', 'border-blue-200', 'dark:border-blue-800', 'shadow-sm');
+            h.innerHTML = '<span>🚩</span>' + h.innerHTML;
+          }
+          if (/recommended resources/i.test(h.textContent)) {
+            h.classList.add('inline-flex', 'items-center', 'gap-2', 'px-3', 'py-1', 'rounded-full', 'bg-green-100', 'dark:bg-green-900', 'text-green-700', 'dark:text-green-200', 'text-base', 'mb-2', 'mt-8', 'border', 'border-green-200', 'dark:border-green-800', 'shadow-sm');
+            h.innerHTML = '<span>📚</span>' + h.innerHTML;
+          }
+          if (/completion|congratulations|success/i.test(h.textContent)) {
+            h.classList.add('inline-flex', 'items-center', 'gap-2', 'px-3', 'py-1', 'rounded-full', 'bg-yellow-100', 'dark:bg-yellow-900', 'text-yellow-700', 'dark:text-yellow-200', 'text-base', 'mb-2', 'mt-8', 'border', 'border-yellow-200', 'dark:border-yellow-800', 'shadow-sm');
+            h.innerHTML = '<span>🎉</span>' + h.innerHTML;
+          }
+        });
+        // Add icons to actionable steps
+        content.querySelectorAll('li').forEach((li) => {
+          if (!li.querySelector('input[type="checkbox"]')) {
+            li.innerHTML = '<span class="mr-2">📝</span>' + li.innerHTML;
+          }
+        });
+        // Style checklists and add progress tracking
+        content.querySelectorAll('input[type="checkbox"]').forEach((cb, idx) => {
+          cb.classList.add('accent-blue-600', 'mr-2', 'w-4', 'h-4', 'align-middle');
+          // Progress tracking with localStorage
+          const key = 'roadmap-checkbox-' + idx;
+          cb.checked = localStorage.getItem(key) === 'true';
+          cb.addEventListener('change', () => {
+            localStorage.setItem(key, cb.checked);
+            updateProgressBar();
+          });
+        });
+        // Make resource links stand out
+        content.querySelectorAll('a').forEach(a => {
+          a.classList.add('text-blue-600', 'hover:underline', 'font-semibold');
+          a.setAttribute('target', '_blank');
+        });
+        // Collapsible sections
+        content.querySelectorAll('h2, h3').forEach(h => {
+          h.style.cursor = 'pointer';
+          h.title = 'Click to collapse/expand section';
+          let next = h.nextElementSibling;
+          let section = [];
+          while (next && !/^H[23]$/i.test(next.tagName)) {
+            section.push(next);
+            next = next.nextElementSibling;
+          }
+          if (section.length) {
+            h.addEventListener('click', () => {
+              section.forEach(el => el.classList.toggle('hidden'));
+            });
+          }
+        });
+        // Add subtle dividers between sections
+        content.querySelectorAll('h2, h3').forEach(h => {
+          const hr = document.createElement('hr');
+          hr.className = 'my-6 border-t border-gray-200 dark:border-gray-700';
+          if (h.previousElementSibling && !/^H[23]$/.test(h.previousElementSibling.tagName)) {
+            h.parentNode.insertBefore(hr, h);
+          }
+        });
+      }
+      enhanceRoadmap();
+
+      // --- Progress Bar ---
+      function updateProgressBar() {
+        const checkboxes = document.querySelectorAll('#roadmapContent input[type="checkbox"]');
+        const checked = Array.from(checkboxes).filter(cb => cb.checked).length;
+        const total = checkboxes.length;
+        const percent = total ? Math.round((checked / total) * 100) : 0;
+        document.getElementById('progressBar').style.width = percent + '%';
+        document.getElementById('progressText').textContent = `${checked} of ${total} steps completed (${percent}%)`;
+      }
+      updateProgressBar();
+      document.querySelectorAll('#roadmapContent input[type="checkbox"]').forEach(cb => {
+        cb.addEventListener('change', updateProgressBar);
+      });
+
+      // --- PDF Download ---
+      document.getElementById('downloadPdfBtn').addEventListener('click', async () => {
+        const roadmapContent = document.getElementById('roadmapContent');
+        if (!roadmapContent || roadmapContent.innerText.trim() === '') {
+          alert('No roadmap to download.');
+          return;
+        }
+        const html = document.documentElement;
+        const hadDark = html.classList.contains('dark');
+        if (hadDark) html.classList.remove('dark');
+        await new Promise(res => setTimeout(res, 200));
+        try {
+          await html2pdf().set({
+            margin: 0.5,
+            filename: 'PathGenAI_Roadmap.pdf',
+            html2canvas: { scale: 2 },
+            jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
+          }).from(roadmapContent).save();
+        } catch (err) {
+          alert('Failed to generate PDF.');
+        } finally {
+          if (hadDark) html.classList.add('dark');
+        }
+      });
+
+      // --- Export as Word ---
+      document.getElementById('exportWordBtn').addEventListener('click', () => {
+        const roadmapContent = document.getElementById('roadmapContent');
+        if (!roadmapContent || roadmapContent.innerText.trim() === '') {
+          alert('No roadmap to export.');
+          return;
+        }
+        const { Document, Packer, Paragraph, TextRun } = window.docx;
+        const doc = new Document();
+        // Convert each paragraph to a docx Paragraph
+        const paras = Array.from(roadmapContent.querySelectorAll('p, li, h1, h2, h3, h4')).map(el =>
+          new Paragraph({
+            children: [new TextRun({ text: el.innerText, bold: /^H[1-4]$/.test(el.tagName) })],
+            spacing: { after: 120 }
+          })
+        );
+        doc.addSection({ children: paras });
+        Packer.toBlob(doc).then(blob => {
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = 'PathGenAI_Roadmap.docx';
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+          URL.revokeObjectURL(url);
+        });
+      });
+
+      // --- Email Roadmap ---
+      document.getElementById('emailRoadmapBtn').addEventListener('click', async () => {
+        const roadmapContent = document.getElementById('roadmapContent');
+        if (!roadmapContent || roadmapContent.innerHTML.trim() === '') {
+          alert('No roadmap to email.');
+          return;
+        }
+        const email = prompt('Enter your email address to receive the roadmap:');
+        if (!email) return;
+        try {
+          const response = await fetch('/email', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              email: email,
+              roadmap: roadmapContent.innerHTML
+            })
+          });
+          const data = await response.json();
+          if (data.success) {
+            alert('Roadmap sent successfully!');
+          } else {
+            throw new Error(data.error || 'Failed to send email.');
+          }
+        } catch (err) {
+          alert('Error: ' + err.message);
+        }
+      });
+
+      // --- Copy to Clipboard ---
+      document.getElementById('copyBtn').addEventListener('click', () => {
+        navigator.clipboard.writeText(roadmapMarkdown).then(() => {
+          alert('Roadmap copied to clipboard!');
+        }, () => {
+          alert('Failed to copy roadmap.');
+        });
+      });
+
+      // --- Print ---
+      document.getElementById('printBtn').addEventListener('click', () => {
+        window.print();
+      });
+
+      // --- Share ---
+      document.getElementById('shareBtn').addEventListener('click', () => {
+        // Encode the roadmap in the URL (base64)
+        const encoded = btoa(unescape(encodeURIComponent(roadmapMarkdown)));
+        const url = `${window.location.origin}/roadmap?data=${encoded}`;
+        navigator.clipboard.writeText(url).then(() => {
+          alert('Shareable link copied to clipboard!');
+        }, () => {
+          alert('Failed to copy shareable link.');
+        });
+      });
+    </script>
+</body>
+</html> 

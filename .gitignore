@@ -1,0 +1,27 @@
+# Environment variables
+# Keep your secret keys and other sensitive data out of version control
+.env
+
+# Virtual Environment
+# The virtual environment contains all the project dependencies and should not be committed
+.venv/
+venv/
+ENV/
+env/
+
+# Python cache and compiled files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Distribution / packaging
+build/
+dist/
+*.egg-info/
+
+# Flask instance folder
+instance/
+
+# IDE settings
+.vscode/
+.idea/
